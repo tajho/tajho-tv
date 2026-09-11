@@ -942,3 +942,511 @@ body {
 #modalAddChannel.active {
   display: flex !important;
 }
+
+/* ==========================================================================
+   MOBILE BRAND HEADER (HIDDEN ON DESKTOP & SMART TV)
+   ========================================================================== */
+.topbar-brand-mobile {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.topbar-brand-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.topbar-brand-name {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN: TABLETS & MEDIUM SCREENS (<= 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .tv-topbar {
+    padding: 12px 30px;
+  }
+  .topbar-search-box {
+    width: 380px;
+  }
+  .hero-billboard {
+    height: 48vh;
+    min-height: 400px;
+    padding: 30px 40px;
+  }
+  .hero-title {
+    font-size: 38px;
+  }
+  .carousels-container {
+    padding: 10px 40px 60px 40px;
+    gap: 36px;
+  }
+  .tv-search-viewport {
+    padding: 24px 40px 60px 40px;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN: SMARTPHONES & MOBILE SCREENS (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tv-app-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* 1. BOTTOM NAVIGATION BAR FOR MOBILE */
+  .tv-sidebar-rail {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100vw;
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(10, 12, 17, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    z-index: 9999;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.75);
+    transition: none;
+  }
+
+  .tv-sidebar-rail.expanded {
+    width: 100vw;
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.75);
+  }
+
+  .rail-brand-container,
+  .tv-sidebar-rail > div:last-child {
+    display: none !important;
+  }
+
+  .rail-nav-items {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    gap: 4px;
+  }
+
+  .rail-btn {
+    flex-direction: column;
+    height: 100%;
+    padding: 4px 6px;
+    gap: 3px;
+    border-radius: 10px;
+    flex: 1;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .rail-btn span {
+    display: block !important;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+  }
+
+  .rail-btn svg,
+  .rail-svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .rail-btn.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+  }
+  .rail-btn.active svg {
+    stroke: var(--accent-emerald);
+  }
+
+  .rail-btn.is-focused {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 2. MAIN VIEWPORT & MOBILE TOPBAR */
+  .tv-main-viewport {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .tv-topbar {
+    height: 60px;
+    padding: 10px 16px;
+    background: rgba(7, 8, 11, 0.94);
+    gap: 12px;
+  }
+
+  .topbar-brand-mobile {
+    display: flex;
+  }
+
+  .topbar-search-box {
+    flex: 1;
+    width: auto;
+    max-width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .global-search-input {
+    font-size: 13px;
+  }
+
+  .global-search-input::placeholder {
+    font-size: 12px;
+  }
+
+  .search-shortcut-badge {
+    display: none !important;
+  }
+
+  .topbar-actions {
+    display: none !important;
+  }
+
+  /* 3. HERO BILLBOARD MOBILE ADAPTATION */
+  .hero-billboard {
+    height: auto;
+    min-height: 290px;
+    padding: 22px 16px 20px 16px;
+    justify-content: flex-end;
+  }
+
+  .hero-badge-strip {
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .hero-tag {
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .hero-server-health {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin-bottom: 4px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .hero-desc {
+    font-size: 12px;
+    line-height: 1.45;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hero-actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btn-hero-play,
+  .btn-hero-secondary {
+    flex: 1;
+    padding: 12px 10px;
+    font-size: 13px;
+    border-radius: 12px;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-hero-play svg,
+  .btn-hero-secondary svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* 4. HORIZONTAL CAROUSELS TOUCH SWIPING */
+  .carousels-container {
+    padding: 14px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
+    gap: 26px;
+  }
+
+  .carousel-section {
+    gap: 12px;
+  }
+
+  .carousel-header {
+    margin-bottom: 2px;
+  }
+
+  .carousel-title {
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    gap: 8px;
+  }
+
+  .section-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .carousel-count {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .carousel-track {
+    gap: 14px;
+    padding: 6px 2px;
+    margin: -6px -2px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .broadcast-card {
+    flex: 0 0 240px;
+    height: 165px;
+    padding: 14px;
+    border-radius: 16px;
+    scroll-snap-align: start;
+    transform: none !important;
+  }
+
+  .card-emblem-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    padding: 4px;
+  }
+
+  .card-badge-row {
+    margin-bottom: 8px;
+  }
+
+  .badge-pill-custom {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+
+  .card-details h4 {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .card-details p {
+    font-size: 10px;
+  }
+
+  .card-footer-strip {
+    margin-top: 8px;
+    padding-top: 8px;
+    font-size: 10px;
+  }
+
+  /* 5. SEARCH VIEW ON MOBILE */
+  .tv-search-viewport {
+    padding: 14px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px;
+    gap: 16px;
+    min-height: auto;
+  }
+
+  .search-chips-container {
+    gap: 8px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .search-chip {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .search-meta-bar {
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .search-results-count {
+    font-size: 11px;
+  }
+
+  .btn-search-back-home {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 8px;
+    gap: 4px;
+  }
+
+  .search-results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .search-results-grid .broadcast-card {
+    height: 155px !important;
+    padding: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .search-results-grid .card-emblem-box {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+    padding: 3px !important;
+  }
+
+  .search-results-grid .card-details h4 {
+    font-size: 13px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-results-grid .card-details p {
+    font-size: 10px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-results-grid .card-footer-strip {
+    font-size: 9px !important;
+    margin-top: 6px !important;
+    padding-top: 6px !important;
+  }
+
+  /* 6. CINEMA PLAYER ON MOBILE */
+  .senior-osd {
+    padding: 18px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
+  }
+
+  #osdChannelTitle {
+    font-size: 16px !important;
+  }
+
+  #osdChannelSub {
+    font-size: 11px !important;
+  }
+
+  .osd-servers-pill-group {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+  }
+
+  .btn-server-switch {
+    padding: 6px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  #btnOsdBack {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+  }
+
+  #btnOsdPlayPause,
+  #btnOsdMute {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* 7. MODAL ON MOBILE (BOTTOM SHEET) */
+  #modalAddChannel {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  #modalAddChannel > div {
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 90vh !important;
+    padding: 22px 18px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN: ULTRA COMPACT PHONES (<= 400px)
+   ========================================================================== */
+@media (max-width: 400px) {
+  .topbar-brand-name {
+    display: none;
+  }
+  .search-results-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-title {
+    font-size: 21px;
+  }
+  .broadcast-card {
+    flex: 0 0 215px;
+    height: 155px;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN: MOBILE LANDSCAPE ORIENTATION (WATCHING FULLSCREEN)
+   ========================================================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .tv-sidebar-rail {
+    display: none !important;
+  }
+  .tv-main-viewport {
+    padding-bottom: 0 !important;
+  }
+  .senior-osd {
+    padding: 12px 24px;
+  }
+}
