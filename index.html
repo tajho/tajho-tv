@@ -17,8 +17,8 @@
   <!-- Hls.js Streaming Engine -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 
-  <!-- Senior Stylesheet -->
-  <link rel="stylesheet" href="styles_senior.css">
+  <!-- Senior Stylesheet (Cache-Busted v6.0) -->
+  <link rel="stylesheet" href="styles_senior.css?v=6.0">
 </head>
 <body>
 
@@ -348,14 +348,16 @@
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 
-  <!-- SCRIPTS -->
-  <script src="channels_senior.js"></script>
-  <script src="app_senior.js"></script>
+  <!-- SCRIPTS (Cache-Busted v6.0) -->
+  <script src="channels_senior.js?v=6.0"></script>
+  <script src="app_senior.js?v=6.0"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then((reg) => {
-          console.log('[TAJHO TV PWA] Service Worker registrado con éxito:', reg.scope);
+        navigator.serviceWorker.register('./sw.js?v=6.0').then((reg) => {
+          console.log('[TAJHO TV PWA] Service Worker v6 registrado con éxito:', reg.scope);
+          // Check for worker updates
+          reg.update();
         }).catch((err) => {
           console.warn('[TAJHO TV PWA] Service Worker registro falló:', err);
         });

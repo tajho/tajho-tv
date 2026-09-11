@@ -1055,6 +1055,17 @@
       isMuted = video.muted;
     });
 
+    // Mobile Touch: Tap video to toggle OSD controls
+    playerModal.addEventListener('click', (e) => {
+      if (e.target === playerModal || e.target === video || e.target === playerOsd) {
+        if (playerOsd.classList.contains('hidden')) {
+          showOsd();
+        } else {
+          playerOsd.classList.add('hidden');
+        }
+      }
+    });
+
     btnModalCancel.addEventListener('click', closeModal);
     btnModalSave.addEventListener('click', () => {
       const name = inputChannelName.value.trim();
