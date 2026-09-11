@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="com.tajhotv.app" version="1.0.0">
+    <name>TAJHO TV</name>
+    <description>Plataforma de Fútbol y Deportes en Vivo TAJHO TV para Hisense Smart TV</description>
+    <author href="http://localhost">TAJHO TV</author>
+    <icon src="logo.png"/>
+    <content src="index.html"/>
+    <preference name="fullscreen" value="true"/>
+    <preference name="orientation" value="landscape"/>
+</widget>

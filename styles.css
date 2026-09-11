@@ -1,0 +1,769 @@
+/* ==========================================================
+   FÚTBOL TV PRO - STYLES FOR 55" SMART TV (VIDAA / BROWSER)
+   ========================================================== */
+
+:root {
+  --bg-main: #090b10;
+  --bg-surface: #11141c;
+  --bg-card: #171b26;
+  --bg-card-hover: #1f2533;
+  --accent-emerald: #10b981;
+  --accent-glow: rgba(16, 185, 129, 0.45);
+  --accent-blue: #3b82f6;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-focused: #10b981;
+  --card-radius: 20px;
+  --pill-radius: 9999px;
+  --transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Background Atmosphere Glow */
+body::before {
+  content: "";
+  position: fixed;
+  top: -10vw;
+  left: 20vw;
+  width: 60vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(59, 130, 246, 0.05) 45%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* TV APP WRAPPER */
+.tv-app-container {
+  position: relative;
+  z-index: 1;
+  padding: 32px 48px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   TOP TV HEADER & CONTROLS HELPER
+   ========================================================== */
+.tv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tv-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.brand-text h1 {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: var(--pill-radius);
+  letter-spacing: 1px;
+}
+
+.brand-subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.tv-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.remote-hint-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  padding: 8px 16px;
+  border-radius: var(--pill-radius);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.remote-key-tag {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-family: monospace;
+}
+
+.live-clock {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================
+   CATEGORY NAVIGATION BAR (SPATIAL TABS)
+   ========================================================== */
+.categories-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 30px;
+  scrollbar-width: none;
+}
+.categories-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  padding: 12px 24px;
+  border-radius: var(--pill-radius);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.category-tab:hover,
+.category-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.category-tab.active {
+  background: #fff;
+  color: #090b10;
+  border-color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+}
+
+/* TV FOCUS STATE FOR TABS */
+.category-tab.is-focused {
+  background: var(--accent-emerald) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-emerald) !important;
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px #ffffff, 0 8px 24px var(--accent-glow) !important;
+}
+
+/* ACTION BUTTON ADD M3U */
+.btn-add-m3u {
+  margin-left: auto;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  padding: 12px 22px;
+  border-radius: var(--pill-radius);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.btn-add-m3u.is-focused {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px #ffffff, 0 8px 24px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* ==========================================================
+   CHANNELS GRID
+   ========================================================== */
+.channels-section-title {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.channels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+/* CHANNEL CARD */
+.channel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--card-radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 230px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.channel-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.4), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.channel-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-4px);
+}
+
+/* TV REMOTE FOCUS STATE ON CARDS - ULTRA VISIBLE FOR 55" SCREEN */
+.channel-card.is-focused {
+  background: #1e2433 !important;
+  border-color: var(--accent-emerald) !important;
+  transform: scale(1.05) translateY(-6px) !important;
+  box-shadow: 0 0 0 4px #10b981, 0 20px 40px rgba(16, 185, 129, 0.35) !important;
+  z-index: 10;
+}
+
+.channel-card.is-focused::before {
+  opacity: 1;
+  background: var(--accent-emerald);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card-logo-container {
+  width: 68px;
+  height: 68px;
+  border-radius: 16px;
+  /* badge */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  flex-shrink: 0;
+}
+
+.card-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.card-badge-pill {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: var(--pill-radius);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-live {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f43f5e;
+  box-shadow: 0 0 8px #f43f5e;
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-name {
+  font-size: 19px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.card-tournament {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-emerald);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-btn-play {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.channel-card.is-focused .card-btn-play {
+  background: var(--accent-emerald);
+  color: #ffffff;
+  border-color: var(--accent-emerald);
+}
+
+/* ==========================================================
+   FULLSCREEN VIDEO CINEMA PLAYER VIEW
+   ========================================================== */
+.player-modal {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.player-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* ON-SCREEN DISPLAY (OSD) OVERLAY */
+.player-osd {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 60px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 25%, transparent 70%, rgba(0,0,0,0.92) 100%);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.player-osd.hidden {
+  opacity: 0;
+}
+
+.player-osd * {
+  pointer-events: auto;
+}
+
+/* OSD TOP BAR */
+.osd-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-osd-back {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 14px 28px;
+  border-radius: var(--pill-radius);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: var(--transition);
+}
+
+.btn-osd-back.is-focused,
+.btn-osd-back:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px #10b981 !important;
+}
+
+.osd-channel-meta {
+  text-align: right;
+}
+
+.osd-channel-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.osd-channel-sub {
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* OSD BOTTOM BAR (QUICK CHANNEL SWITCHER) */
+.osd-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.osd-quick-channels-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.osd-quick-channels-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  scrollbar-width: none;
+}
+.osd-quick-channels-row::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-ch-item {
+  background: rgba(20, 24, 34, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.quick-ch-item.is-focused {
+  background: #10b981 !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px #ffffff, 0 8px 24px var(--accent-glow) !important;
+}
+
+.quick-ch-item.active-current {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.osd-controls-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+}
+
+.osd-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.osd-btn-action {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: var(--pill-radius);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.osd-btn-action.is-focused {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: scale(1.06);
+}
+
+/* BUFFERING SPINNER */
+.player-buffering {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 24px 36px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.player-buffering.active {
+  display: flex;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(16, 185, 129, 0.2);
+  border-top-color: var(--accent-emerald);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================
+   MODAL: AGREGAR CANAL / M3U PERSONALIZADO
+   ========================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(14px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 620px;
+  padding: 36px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.modal-sub {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-input.is-focused,
+.form-input:focus {
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.btn-modal {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+}
+
+.btn-modal-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-modal-save {
+  background: var(--accent-emerald);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-modal.is-focused {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px #fff !important;
+}
+
+/* ==========================================================
+   RESPONSIVE ADJUSTMENTS FOR 55" vs LAPTOPS
+   ========================================================== */
+@media (max-width: 1024px) {
+  .tv-app-container {
+    padding: 20px 24px;
+  }
+  .channels-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+}

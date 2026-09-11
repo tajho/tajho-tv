@@ -1,0 +1,19 @@
+{
+  "name": "TAJHO TV — Deportes y Fútbol en Vivo",
+  "short_name": "TAJHO TV",
+  "description": "Plataforma de Fútbol y Deportes en Vivo para Smart TV Hisense VIDAA y PC",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#07080b",
+  "theme_color": "#07080b",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
