@@ -22,26 +22,17 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
             <span>{section.title}</span>
           </div>
         </div>
-        <div style={{
-          padding: '24px 32px',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px dashed rgba(255, 255, 255, 0.12)',
-          borderRadius: '18px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
+        <div className="p-6 sm:p-8 bg-white/[0.03] border border-dashed border-white/15 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h4 style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>No tienes canales personalizados aún</h4>
-            <p style={{ fontSize: 13, color: '#94a3b8' }}>Agrega cualquier enlace .m3u8, reproductor web o analiza listas M3U.</p>
+            <h4 className="text-base font-extrabold text-white mb-1">No tienes canales personalizados aún</h4>
+            <p className="text-xs sm:text-sm text-slate-400">Agrega cualquier enlace .m3u8, reproductor web o analiza listas M3U.</p>
           </div>
           <button
             type="button"
-            className="btn-hero-secondary"
-            style={{ padding: '10px 20px', fontSize: 13 }}
+            className="btn-luxury-primary px-5 py-2.5 text-xs sm:text-sm"
             onClick={onOpenM3uModal}
           >
-            ➕ Cargar Lista M3U
+            <span>➕ Cargar Lista M3U</span>
           </button>
         </div>
       </div>
@@ -54,7 +45,7 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
     <div className="carousel-section">
       <div className="carousel-header">
         <div className="carousel-title">
-          <IconComponent size={22} style={{ color: '#10b981' }} />
+          <IconComponent size={22} className="text-emerald-400" />
           <span>{section.title}</span>
         </div>
         <span className="carousel-count">{channels.length} SEÑALES</span>

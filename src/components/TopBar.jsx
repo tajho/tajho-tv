@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, X, Plus, Radio } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, X, Plus, ShieldCheck } from 'lucide-react';
 
 export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearch, onOpenModal }) {
   return (
@@ -10,25 +11,27 @@ export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearc
         <span className="topbar-brand-name">TAJHO TV</span>
       </div>
 
-      {/* Global Search Input */}
+      {/* Global Search Input Box */}
       <div className="topbar-search-box" id="topbarSearchBox">
-        <Search size={18} style={{ color: '#94a3b8' }} />
+        <Search size={18} className="search-icon-svg" />
         <input
           type="text"
           className="global-search-input"
-          placeholder="Buscar canal, torneo o señal (ej: ESPN, TyC, Liga 1, Win)..."
+          placeholder="Buscar canal, torneo o señal (ej: ESPN, TyC, Liga 1, Win, Real Madrid)..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={onOpenSearch}
         />
         {searchQuery ? (
-          <button
+          <motion.button
             type="button"
+            className="btn-search-clear"
             onClick={onSearchClear}
-            style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex' }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <X size={16} />
-          </button>
+            <X size={14} />
+          </motion.button>
         ) : (
           <span className="search-shortcut-badge">Buscar /</span>
         )}
@@ -36,18 +39,20 @@ export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearc
 
       {/* Topbar Actions */}
       <div className="topbar-actions">
-        <button
+        <motion.button
           type="button"
           className="btn-topbar-action"
           onClick={onOpenModal}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
         >
           <Plus size={16} />
           <span>Analizar M3U / Web</span>
-        </button>
+        </motion.button>
 
-        <div className="topbar-status-chip">
+        <div className="topbar-live-status">
           <span className="pulse-dot-emerald" />
-          <span>99.8% ONLINE</span>
+          <span>ONLINE</span>
         </div>
       </div>
     </header>

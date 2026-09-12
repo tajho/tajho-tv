@@ -1,94 +1,102 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Search, Plus } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { BroadcastCard } from './BroadcastCard';
+import { Search, Sparkles, Filter, ChevronRight } from 'lucide-react';
 
-export function SearchView({ channels, searchQuery, onClose, onSelectChannel, onOpenModal }) {
-  const [selectedFilter, setSelectedFilter] = useState('all');
-
-  const filterChips = [
-    { id: 'all', label: '⭐ Todos' },
-    { id: 'espn', label: '⚽ ESPN' },
-    { id: 'tyc', label: '🇦🇷 TyC Sports' },
-    { id: 'win', label: '🇨🇴 Win Sports' },
-    { id: 'peru', label: '🇵🇪 Liga 1 / Perú' },
-    { id: 'madrid', label: '🇪🇸 Real Madrid' },
-    { id: 'live', label: '🔴 En Directo' },
-    { id: 'custom', label: '📁 Mis Canales' }
-  ];
-
-  const filtered = channels.filter(ch => {
-    const hay = (ch.name + ' ' + (ch.subtitle || '') + ' ' + (ch.tournament || '') + ' ' + (ch.callsign || '')).toLowerCase();
-    
-    if (selectedFilter === 'espn' && !hay.includes('espn')) return false;
-    if (selectedFilter === 'tyc' && !hay.includes('tyc')) return false;
-    if (selectedFilter === 'win' && !hay.includes('win')) return false;
-    if (selectedFilter === 'peru' && !hay.includes('peru') && !hay.includes('liga 1') && !hay.includes('pe')) return false;
-    if (selectedFilter === 'madrid' && !hay.includes('madrid') && !hay.includes('rmtv')) return false;
-    if (selectedFilter === 'live' && !ch.isLive && ch.category !== 'destacados') return false;
-    if (selectedFilter === 'custom' && ch.category !== 'personalizados') return false;
-
-    if (!searchQuery) return true;
-    return hay.includes(searchQuery.toLowerCase().trim());
-  });
+export function SearchView({
+  searchQuery,
+  onSearchChange,
+  filterTag,
+  onSelectTag,
+  results,
+  onSelectChannel,
+  onBackHome
+}) {
+  const chips = ['Todos', 'ESPN', 'TyC Sports', 'Win Sports', 'Perú', 'Argentina', 'Real Madrid', 'En Directo'];
 
   return (
-    <div className="tv-search-viewport" style={{ display: 'flex' }}>
+    <motion.div
+      className="tv-search-viewport"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="search-view-header">
-        {/* Filter Chips */}
+        {/* Quick Filter Chips */}
         <div className="search-chips-container">
-          {filterChips.map(chip => (
-            <button
-              key={chip.id}
+          <span className="flex items-center gap-1 text-xs font-black text-slate-400 uppercase tracking-wider mr-2">
+            <Filter size={14} className="text-emerald-400" /> Filtros:
+          </span>
+          {chips.map((tag) => (
+            <motion.button
+              key={tag}
               type="button"
-              className={`search-chip ${selectedFilter === chip.id ? 'active' : ''}`}
-              onClick={() => setSelectedFilter(chip.id)}
+              className={`search-chip ${filterTag === tag ? 'active' : ''}`}
+              onClick={() => onSelectTag(tag)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {chip.label}
-            </button>
+              {tag}
+            </motion.button>
           ))}
         </div>
 
-        {/* Meta Header */}
+        {/* Results Count & Back */}
         <div className="search-meta-bar">
-          <span className="search-results-count">
-            MOSTRANDO {filtered.length} SEÑALES {searchQuery ? `PARA "${searchQuery.toUpperCase()}"` : ''}
-          </span>
-          <button type="button" className="btn-search-back-home" onClick={onClose}>
-            <ArrowLeft size={16} />
-            <span>Volver a Inicio</span>
-          </button>
+          <div className="search-results-count flex items-center gap-2">
+            <Sparkles size={16} className="text-emerald-400" />
+            <span>{results.length} Canales Encontrados {searchQuery ? `para "${searchQuery}"` : ''}</span>
+          </div>
+
+          <motion.button
+            type="button"
+            className="btn-search-back-home"
+            onClick={onBackHome}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Volver al Inicio</span>
+            <ChevronRight size={16} />
+          </motion.button>
         </div>
       </div>
 
-      {/* Grid or Empty State */}
-      {filtered.length === 0 ? (
+      {/* Grid Results */}
+      {results.length > 0 ? (
+        <motion.div
+          className="search-results-grid"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.04 }
+            }
+          }}
+        >
+          {results.map((channel) => (
+            <BroadcastCard
+              key={channel.id}
+              channel={channel}
+              isFocused={false}
+              onSelect={onSelectChannel}
+              onFocus={() => {}}
+            />
+          ))}
+        </motion.div>
+      ) : (
         <div className="search-empty-state">
           <div className="empty-icon-box">
             <Search size={36} />
           </div>
-          <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 6 }}>No se encontraron canales</h3>
-          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>Prueba con otro filtro o agrega tu propia señal M3U.</p>
-          <button
-            type="button"
-            className="btn-hero-play"
-            style={{ padding: '10px 20px', fontSize: 13 }}
-            onClick={onOpenModal}
-          >
-            <Plus size={16} />
-            <span>Agregar Señal Manual / M3U</span>
-          </button>
-        </div>
-      ) : (
-        <div className="search-results-grid">
-          {filtered.map((ch) => (
-            <BroadcastCard
-              key={ch.id}
-              channel={ch}
-              onSelect={onSelectChannel}
-            />
-          ))}
+          <h3 className="text-xl font-black text-white mb-2">No encontramos canales con esa búsqueda</h3>
+          <p className="text-sm font-semibold text-slate-400 max-w-md">
+            Prueba buscando "ESPN", "TyC", "Win", "Directo" o usa el analizador para pegar enlaces de listas M3U o páginas web.
+          </p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

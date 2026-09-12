@@ -1,5 +1,6 @@
 import React from 'react';
-import { Play } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Play, Trophy, ShieldCheck, Radio } from 'lucide-react';
 
 export function BroadcastCard({ channel, isFocused, onSelect, onFocus }) {
   const displayName = channel.subtitle || channel.name || channel.title || 'TV';
@@ -10,17 +11,23 @@ export function BroadcastCard({ channel, isFocused, onSelect, onFocus }) {
   const glowColor = channel.glowColor || 'rgba(16, 185, 129, 0.45)';
 
   return (
-    <div
+    <motion.div
       className={`broadcast-card ${isFocused ? 'is-focused' : ''}`}
       onClick={() => onSelect(channel)}
       onMouseEnter={onFocus}
       role="button"
       tabIndex={0}
+      whileHover={{ scale: 1.04, y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 450, damping: 25 }}
     >
-      {/* Ambient Glow */}
-      <div className="card-ambient-glow" style={{ background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)` }} />
+      {/* Ambient Dynamic Aura */}
+      <div
+        className="card-ambient-glow"
+        style={{ background: `radial-gradient(circle at 80% 20%, ${glowColor} 0%, transparent 70%)` }}
+      />
 
-      {/* Top Header */}
+      {/* Header Strip: Live Equalizer + Resolution */}
       <div className="card-header-strip">
         <div className="badge-live-equalizer">
           <div className="live-bars-group">
@@ -31,21 +38,25 @@ export function BroadcastCard({ channel, isFocused, onSelect, onFocus }) {
         <span className="card-quality-pill">{quality}</span>
       </div>
 
-      {/* Center Section: Emblem + Action */}
+      {/* Center Stage: Crystal Emblem + Floating Play Action */}
       <div className="card-center-stage">
-        <div className="card-emblem-crystal" style={{ background: channel.color || '#0f172a' }}>
+        <div
+          className="card-emblem-crystal"
+          style={{ background: channel.color || 'linear-gradient(135deg, #1e293b, #0f172a)' }}
+        >
           {channel.logo ? (
             <img
               src={channel.logo}
-              alt={callsign}
+              alt=""
               className="card-logo-img"
+              loading="lazy"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
               }}
             />
           ) : null}
-          <span style={{ display: channel.logo ? 'none' : 'block', fontWeight: 950, fontSize: 14, color: '#fff' }}>
+          <span style={{ display: channel.logo ? 'none' : 'block', fontWeight: 950, fontSize: 13, color: '#ffffff', letterSpacing: 0.5 }}>
             {callsign}
           </span>
         </div>
@@ -55,19 +66,22 @@ export function BroadcastCard({ channel, isFocused, onSelect, onFocus }) {
         </div>
       </div>
 
-      {/* Footer Info */}
+      {/* Details Footer */}
       <div className="card-details-footer">
         <div className="card-tournament-tag">
-          <span>🏆 {tournament}</span>
+          <Trophy size={11} className="shrink-0 text-amber-400" />
+          <span className="truncate">{tournament}</span>
         </div>
-        <h4 className="card-channel-name">{displayName}</h4>
+        <h4 className="card-channel-name" title={displayName}>{displayName}</h4>
         <div className="card-status-bar">
           <span className="card-server-online">
             <span className="card-pulse-emerald" /> {numServers} {numServers > 1 ? 'Servidores' : 'Servidor'}
           </span>
-          <span>99.8% ONLINE</span>
+          <span className="text-emerald-400 font-extrabold flex items-center gap-1">
+            <ShieldCheck size={11} /> 99.8% ONLINE
+          </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

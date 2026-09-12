@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Hls from 'hls.js';
-import { ArrowLeft, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ShieldCheck, Radio, Server, Sparkles } from 'lucide-react';
 
 export function CinemaPlayer({ channel, onClose }) {
   const videoRef = useRef(null);
@@ -26,7 +27,7 @@ export function CinemaPlayer({ channel, onClose }) {
     clearTimeout(osdTimerRef.current);
     osdTimerRef.current = setTimeout(() => {
       setShowOsd(false);
-    }, 4500);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function CinemaPlayer({ channel, onClose }) {
     if (!video || !currentSource) return;
 
     let streamUrl = currentSource.url;
-    // Mixed Content Shield: If running on HTTPS, route HTTP through CORS proxy
+    // Mixed Content Shield: Tunnel HTTP through HTTPS CORS proxy
     if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
       streamUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(streamUrl);
     }
@@ -70,10 +71,9 @@ export function CinemaPlayer({ channel, onClose }) {
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
           console.warn('HLS Fatal error:', data);
-          // Failover to next server
           if (currentSourceIndex + 1 < sources.length) {
             triggerToast(`⚠️ Servidor ${currentSourceIndex + 1} no responde. Conmutando a espejo...`);
-            setCurrentSourceIndex(prev => prev + 1);
+            setCurrentSourceIndex((prev) => prev + 1);
           } else {
             setBuffering(false);
             triggerToast('❌ Todos los servidores están fuera de línea.');
@@ -99,9 +99,10 @@ export function CinemaPlayer({ channel, onClose }) {
         hlsRef.current = null;
       }
     };
-  }, [channel, currentSourceIndex]);
+  }, [currentSourceIndex, currentSource]);
 
   const togglePlay = () => {
+    resetOsdTimer();
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
@@ -111,142 +112,156 @@ export function CinemaPlayer({ channel, onClose }) {
       video.pause();
       setIsPaused(true);
     }
-    resetOsdTimer();
   };
 
   const toggleMute = () => {
+    resetOsdTimer();
     const video = videoRef.current;
     if (!video) return;
     video.muted = !video.muted;
     setIsMuted(video.muted);
-    resetOsdTimer();
   };
 
   return (
     <div
       className="senior-player-modal active"
-      onClick={(e) => {
-        if (e.target === e.currentTarget || e.target === videoRef.current) {
-          setShowOsd(prev => !prev);
-        }
-      }}
+      onClick={resetOsdTimer}
+      onMouseMove={resetOsdTimer}
+      style={{ zIndex: 12000 }}
     >
       <video
         ref={videoRef}
-        className="senior-video"
+        className="cinema-video-element"
         playsInline
         autoPlay
+        onWaiting={() => setBuffering(true)}
+        onPlaying={() => setBuffering(false)}
+        onClick={resetOsdTimer}
       />
 
       {/* Buffering Indicator */}
-      {buffering ? (
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0,0,0,0.65)',
-          gap: 14,
-          zIndex: 100
-        }}>
-          <div style={{
-            width: 50,
-            height: 50,
-            border: '4px solid rgba(255,255,255,0.2)',
-            borderTopColor: '#10b981',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite'
-          }} />
-          <span style={{ fontSize: 13, fontWeight: 900, color: '#34d399', letterSpacing: 1 }}>
-            CONECTANDO CON SEÑAL DIGITAL HD...
+      {buffering && (
+        <motion.div
+          className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm gap-4 z-50 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-emerald-400 animate-spin" />
+          <span className="text-sm font-black text-emerald-300 tracking-wider flex items-center gap-2">
+            <Radio size={16} className="animate-pulse" /> SINTONIZANDO SEÑAL DIGITAL HD...
           </span>
-        </div>
-      ) : null}
+        </motion.div>
+      )}
 
-      {/* Failover Toast */}
-      {toastMsg ? (
-        <div className="failover-toast" style={{ display: 'block' }}>
-          {toastMsg}
-        </div>
-      ) : null}
-
-      {/* Player OSD */}
-      <div className={`senior-osd ${showOsd ? '' : 'hidden'}`}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button
-            type="button"
-            className="btn-hero-secondary"
-            style={{ padding: '10px 18px', fontSize: 13 }}
-            onClick={onClose}
+      {/* Failover Toast Notification */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            className="failover-toast !flex items-center gap-2"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <ArrowLeft size={18} />
-            <span>Volver al Catálogo</span>
-          </button>
+            <span>{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          <div style={{ textAlign: 'right' }}>
-            <h2 style={{ fontSize: 20, fontWeight: 950, color: '#fff' }}>
-              {channel.subtitle || channel.name}
-            </h2>
-            <p style={{ fontSize: 12, color: '#94a3b8', fontWeight: 800 }}>
-              {channel.tournament || channel.title || 'Deportes en Directo'} • {currentSource?.name}
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Controls */}
-        <div>
-          {/* Server Switchers */}
-          <div style={{ marginBottom: 14 }}>
-            <span style={{ fontSize: 10, fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, display: 'block', marginBottom: 8 }}>
-              Servidores de Respaldo Disponibles (Conmutación Automática Anti-Caídas):
-            </span>
-            <div className="osd-servers-pill-group">
-              {sources.map((src, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`btn-server-switch ${idx === currentSourceIndex ? 'active' : ''}`}
-                  onClick={() => setCurrentSourceIndex(idx)}
-                >
-                  {src.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Action Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
+      {/* Luxury Player OSD Controls */}
+      <AnimatePresence>
+        {showOsd && (
+          <motion.div
+            className="senior-osd"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <motion.button
                 type="button"
-                className="btn-hero-play"
-                style={{ padding: '10px 20px', fontSize: 13 }}
-                onClick={togglePlay}
+                className="btn-luxury-glass px-4 py-2 text-xs sm:text-sm"
+                onClick={onClose}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {isPaused ? <Play size={16} fill="currentColor" /> : <Pause size={16} fill="currentColor" />}
-                <span>{isPaused ? 'Reanudar' : 'Pausar'}</span>
-              </button>
+                <ArrowLeft size={18} />
+                <span>Volver al Catálogo</span>
+              </motion.button>
 
-              <button
-                type="button"
-                className="btn-hero-secondary"
-                style={{ padding: '10px 18px', fontSize: 13 }}
-                onClick={toggleMute}
-              >
-                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                <span>{isMuted ? 'Activar Sonido' : 'Silenciar'}</span>
-              </button>
+              <div className="text-right">
+                <h2 className="text-lg sm:text-2xl font-black text-white">
+                  {channel.subtitle || channel.name}
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 font-bold flex items-center justify-end gap-1.5 mt-0.5">
+                  <ShieldCheck size={14} className="text-emerald-400" />
+                  <span>{channel.tournament || channel.title || 'Deportes en Directo'} • {currentSource?.name}</span>
+                </p>
+              </div>
             </div>
 
-            <div style={{ fontSize: 11, fontWeight: 800, color: '#64748b' }}>
-              Toca la pantalla o presiona OK en tu mando para ocultar controles
+            {/* Footer Controls */}
+            <div>
+              {/* Server Switchers */}
+              <div className="mb-4">
+                <span className="text-[11px] font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                  <Server size={12} className="text-emerald-400" /> Servidores de Respaldo (Anti-Caídas):
+                </span>
+                <div className="osd-servers-pill-group">
+                  {sources.map((src, idx) => {
+                    const isCurrent = idx === currentSourceIndex;
+                    return (
+                      <motion.button
+                        key={idx}
+                        type="button"
+                        className={`btn-server-switch ${isCurrent ? 'active' : ''}`}
+                        onClick={() => setCurrentSourceIndex(idx)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {src.name}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Action Buttons Row */}
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    type="button"
+                    className="btn-luxury-primary px-5 py-2.5 text-xs sm:text-sm"
+                    onClick={togglePlay}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {isPaused ? <Play size={16} fill="currentColor" /> : <Pause size={16} fill="currentColor" />}
+                    <span>{isPaused ? 'Reanudar' : 'Pausar'}</span>
+                  </motion.button>
+
+                  <motion.button
+                    type="button"
+                    className="btn-luxury-glass px-4 py-2.5 text-xs sm:text-sm"
+                    onClick={toggleMute}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                    <span>{isMuted ? 'Activar Sonido' : 'Silenciar'}</span>
+                  </motion.button>
+                </div>
+
+                <div className="text-[11px] font-bold text-slate-400">
+                  Toca la pantalla o presiona OK en tu mando para ocultar controles
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
