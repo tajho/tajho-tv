@@ -711,137 +711,268 @@ body {
   display: none;
 }
 
-/* BROADCAST CARD (16:9 PROPORTIONS) */
+/* ==========================================================================
+   LUXURY BROADCAST CARDS (CERO DISEÑO GENÉRICO — APPLE TV / DAZN CINEMATIC)
+   ========================================================================== */
 .broadcast-card {
   flex: 0 0 320px;
-  height: 200px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  padding: 20px;
+  height: 205px;
+  background: linear-gradient(145deg, rgba(20, 25, 37, 0.88) 0%, rgba(10, 13, 19, 0.96) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Ambient Channel Glow Backdrop */
+.card-ambient-glow {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  filter: blur(35px);
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1;
+}
+
+/* Subtle Top Glass Border Accent */
 .broadcast-card::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  opacity: 0.6;
+  transition: opacity 0.25s ease;
+  z-index: 3;
 }
 
-/* CARD TV FOCUS STATE - ULTRA HIGH VISIBILITY FOR 55" */
-.broadcast-card.is-focused {
-  background: #1b202c !important;
-  border-color: var(--focus-emerald) !important;
-  transform: scale(1.08) translateY(-8px) !important;
-  box-shadow: 0 0 0 4px #10b981, 0 24px 50px rgba(16, 185, 129, 0.4) !important;
-  z-index: 20;
-}
-
-.broadcast-card.is-focused::before {
-  opacity: 1;
-  background: var(--focus-emerald);
-}
-
-.card-badge-row {
+/* Card Header Strip: Live Equalizer + Quality Pill */
+.card-header-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  position: relative;
+  z-index: 4;
 }
 
-.badge-pill-custom {
-  font-size: 11px;
-  font-weight: 900;
+/* Animated Live Equalizer Badge */
+.badge-live-equalizer {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(244, 63, 94, 0.16);
+  border: 1px solid rgba(244, 63, 94, 0.4);
   padding: 4px 10px;
   border-radius: 9999px;
+  box-shadow: 0 2px 10px rgba(244, 63, 94, 0.25);
+}
+
+.live-bars-group {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.live-bars-group span {
+  width: 2.2px;
+  background: #f43f5e;
+  border-radius: 1px;
+  animation: equalizeMotion 1s infinite alternate ease-in-out;
+}
+
+.live-bars-group span:nth-child(1) { height: 35%; animation-delay: 0.1s; }
+.live-bars-group span:nth-child(2) { height: 100%; animation-delay: 0.35s; }
+.live-bars-group span:nth-child(3) { height: 65%; animation-delay: 0.2s; }
+.live-bars-group span:nth-child(4) { height: 85%; animation-delay: 0.45s; }
+
+@keyframes equalizeMotion {
+  0% { height: 25%; }
+  100% { height: 100%; }
+}
+
+.live-label-text {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: #fb7185;
+}
+
+.card-quality-pill {
+  font-size: 10px;
+  font-weight: 850;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 8px;
+  border-radius: 8px;
   letter-spacing: 0.5px;
 }
 
-.badge-live-pulse {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.35);
+/* Card Center Section: Emblem + Action Overlay */
+.card-center-stage {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  margin: 10px 0;
+  position: relative;
+  z-index: 4;
 }
 
-.pulse-dot-red {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #f43f5e;
-  box-shadow: 0 0 8px #f43f5e;
-  animation: pulseDot 1.3s infinite;
-}
-
-.card-emblem-box {
-  width: 58px;
-  height: 58px;
+.card-emblem-crystal {
+  width: 54px;
+  height: 54px;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 15px;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
-  margin-bottom: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  padding: 7px;
   overflow: hidden;
-  padding: 6px;
-  background: #0f172a;
+  transition: transform 0.25s ease;
 }
 
 .card-logo-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
 }
 
-.card-details h4 {
-  font-size: 18px;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.25;
-  margin-bottom: 4px;
+/* Floating Play Action Circle on Card */
+.card-play-action {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  transform: scale(0.92);
+  opacity: 0.85;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-details p {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-emerald);
-  text-transform: uppercase;
+.card-play-action svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  margin-left: 2px;
+}
+
+/* Card Details Footer */
+.card-details-footer {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-tournament-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #34d399;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.card-footer-strip {
+.card-channel-name {
+  font-size: 17px;
+  font-weight: 950;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.card-status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 11px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 10.5px;
   font-weight: 800;
-  color: var(--text-muted);
+  color: #94a3b8;
 }
 
-.card-servers-count {
+.card-server-online {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   color: #34d399;
+}
+
+.card-pulse-emerald {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* HOVER & SMART TV REMOTE FOCUS STATES (55" SENIOR EXPERIENCE) */
+.broadcast-card:hover,
+.broadcast-card.is-focused {
+  background: linear-gradient(145deg, rgba(28, 35, 52, 0.95) 0%, rgba(13, 17, 26, 0.98) 100%) !important;
+  border-color: #10b981 !important;
+  transform: translateY(-8px) scale(1.04) !important;
+  box-shadow: 0 0 0 3.5px #10b981, 0 24px 50px rgba(16, 185, 129, 0.45) !important;
+  z-index: 20;
+}
+
+.broadcast-card:hover .card-ambient-glow,
+.broadcast-card.is-focused .card-ambient-glow {
+  opacity: 0.65;
+  transform: scale(1.2);
+}
+
+.broadcast-card:hover .card-emblem-crystal,
+.broadcast-card.is-focused .card-emblem-crystal {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.broadcast-card:hover .card-play-action,
+.broadcast-card.is-focused .card-play-action {
+  background: #10b981;
+  border-color: #10b981;
+  color: #07080b;
+  transform: scale(1.12);
+  opacity: 1;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
 }
 
 /* ==========================================================================
@@ -1255,45 +1386,66 @@ body {
   }
 
   .broadcast-card {
-    flex: 0 0 240px;
-    height: 165px;
-    padding: 14px;
-    border-radius: 16px;
+    flex: 0 0 250px;
+    height: 175px;
+    padding: 12px 14px;
+    border-radius: 18px;
     scroll-snap-align: start;
     transform: none !important;
   }
 
-  .card-emblem-box {
+  .card-ambient-glow {
+    width: 90px;
+    height: 90px;
+  }
+
+  .card-emblem-crystal {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
-    font-size: 13px;
-    margin-bottom: 8px;
-    padding: 4px;
+    border-radius: 13px;
+    padding: 5px;
   }
 
-  .card-badge-row {
-    margin-bottom: 8px;
+  .card-play-action {
+    width: 38px;
+    height: 38px;
   }
 
-  .badge-pill-custom {
-    font-size: 9px;
+  .card-play-action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .badge-live-equalizer {
     padding: 3px 8px;
+    gap: 5px;
   }
 
-  .card-details h4 {
+  .live-bars-group {
+    height: 9px;
+  }
+
+  .live-label-text {
+    font-size: 9px;
+  }
+
+  .card-quality-pill {
+    font-size: 8.5px;
+    padding: 2px 6px;
+  }
+
+  .card-channel-name {
     font-size: 14px;
-    margin-bottom: 2px;
   }
 
-  .card-details p {
-    font-size: 10px;
+  .card-tournament-tag {
+    font-size: 9.5px;
   }
 
-  .card-footer-strip {
-    margin-top: 8px;
-    padding-top: 8px;
-    font-size: 10px;
+  .card-status-bar {
+    font-size: 9.5px;
+    margin-top: 2px;
+    padding-top: 4px;
   }
 
   /* 5. SEARCH VIEW ON MOBILE */
@@ -1337,38 +1489,36 @@ body {
   }
 
   .search-results-grid .broadcast-card {
-    height: 155px !important;
-    padding: 12px !important;
-    border-radius: 14px !important;
+    height: 165px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
   }
 
-  .search-results-grid .card-emblem-box {
-    width: 36px !important;
-    height: 36px !important;
+  .search-results-grid .card-emblem-crystal {
+    width: 38px !important;
+    height: 38px !important;
     border-radius: 10px !important;
-    font-size: 11px !important;
-    margin-bottom: 6px !important;
-    padding: 3px !important;
+    padding: 4px !important;
   }
 
-  .search-results-grid .card-details h4 {
+  .search-results-grid .card-channel-name {
     font-size: 13px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .search-results-grid .card-details p {
-    font-size: 10px !important;
+  .search-results-grid .card-tournament-tag {
+    font-size: 9px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .search-results-grid .card-footer-strip {
+  .search-results-grid .card-status-bar {
     font-size: 9px !important;
-    margin-top: 6px !important;
-    padding-top: 6px !important;
+    margin-top: 4px !important;
+    padding-top: 4px !important;
   }
 
   /* 6. CINEMA PLAYER ON MOBILE */

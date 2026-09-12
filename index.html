@@ -17,8 +17,11 @@
   <!-- Hls.js Streaming Engine -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 
-  <!-- Senior Stylesheet (Cache-Busted v6.0) -->
-  <link rel="stylesheet" href="styles_senior.css?v=6.0">
+  <!-- Lucide Icons Modern Library -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Senior Stylesheet (Cache-Busted v7.0) -->
+  <link rel="stylesheet" href="styles_senior.css?v=7.0">
 </head>
 <body>
 
@@ -293,14 +296,20 @@
         </button>
 
         <!-- ANALYZER RESULTS CONTAINER -->
-        <div id="analyzerResultsContainer" style="display: none; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px; margin-top: 10px;">
+        <div id="analyzerResultsContainer" style="display: none; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 18px; margin-top: 10px;">
           <div id="analyzerStatusHeader" style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
             <span id="analyzerStatusText">Extracción completada</span>
-            <button type="button" id="btnImportAllExtracted" style="background: #10b981; color: #fff; font-weight: 900; font-size: 12px; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">
-              📥 Importar Todo
+            <button type="button" id="btnImportAllExtracted" style="background: #10b981; color: #fff; font-weight: 900; font-size: 12px; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(16,185,129,0.3);">
+              📥 Importar Seleccionados
             </button>
           </div>
-          <div id="analyzerChannelsList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+
+          <!-- M3U DYNAMIC CATEGORY TABS -->
+          <div id="analyzerCategoryTabs" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none;">
+            <!-- Rendered by app_senior.js -->
+          </div>
+
+          <div id="analyzerChannelsList" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
             <!-- Rendered by app_senior.js -->
           </div>
         </div>
@@ -348,14 +357,14 @@
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 
-  <!-- SCRIPTS (Cache-Busted v6.0) -->
-  <script src="channels_senior.js?v=6.0"></script>
-  <script src="app_senior.js?v=6.0"></script>
+  <!-- SCRIPTS (Cache-Busted v7.0) -->
+  <script src="channels_senior.js?v=7.0"></script>
+  <script src="app_senior.js?v=7.0"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=6.0').then((reg) => {
-          console.log('[TAJHO TV PWA] Service Worker v6 registrado con éxito:', reg.scope);
+        navigator.serviceWorker.register('./sw.js?v=7.0').then((reg) => {
+          console.log('[TAJHO TV PWA] Service Worker v7 registrado con éxito:', reg.scope);
           // Check for worker updates
           reg.update();
         }).catch((err) => {

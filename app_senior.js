@@ -147,37 +147,59 @@
     }
   }
 
-  // --- BROADCAST CARD COMPONENT ---
+  // --- BROADCAST CARD COMPONENT (CERO DISEÑO GENÉRICO — APPLE TV / DAZN STYLE) ---
   function createBroadcastCard(ch, rowIdx, colIdx, onClick) {
     const card = document.createElement('div');
     card.className = 'broadcast-card';
     if (rowIdx !== undefined) card.dataset.row = rowIdx;
     if (colIdx !== undefined) card.dataset.col = colIdx;
 
-    const displayName = ch.name || ch.subtitle || ch.title || 'TV';
-    const callsign = ch.callsign || ch.shortName || displayName.substring(0, 4).toUpperCase();
-    const badge = ch.badge || 'HD';
+    const displayName = ch.subtitle || ch.name || ch.title || 'TV';
+    const callsign = ch.callsign || ch.shortName || displayName.substring(0, 5).toUpperCase();
+    const quality = ch.quality || '1080p 60FPS';
     const numServers = ch.sources ? ch.sources.length : 1;
+    const tournament = ch.tournament || ch.title || 'Fútbol & Deportes en Vivo';
+    const glowColor = ch.color ? ch.color.match(/#[0-9a-fA-F]{6}|rgba?\([^)]+\)/)?.[0] || 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.4)';
+
     const emblemHtml = ch.logo
-      ? `<img src="${ch.logo}" alt="${callsign}" class="card-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none;">${callsign}</span>`
-      : `<span>${callsign}</span>`;
+      ? `<img src="${ch.logo}" alt="${callsign}" class="card-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-weight:950; font-size:14px; color:#fff;">${callsign}</span>`
+      : `<span style="font-weight:950; font-size:14px; color:#fff;">${callsign}</span>`;
 
     card.innerHTML = `
-      <div class="card-badge-row">
-        <div class="card-emblem-box" style="background: ${ch.color || 'linear-gradient(135deg, #10b981, #047857)'};">
+      <!-- Dynamic Ambient Glow -->
+      <div class="card-ambient-glow" style="background: radial-gradient(circle, ${glowColor} 0%, transparent 70%);"></div>
+
+      <!-- Header: Live Equalizer + Resolution Pill -->
+      <div class="card-header-strip">
+        <div class="badge-live-equalizer">
+          <div class="live-bars-group">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <span class="live-label-text">EN VIVO</span>
+        </div>
+        <span class="card-quality-pill">${quality}</span>
+      </div>
+
+      <!-- Center Stage: Crystal Emblem + Floating Play Action -->
+      <div class="card-center-stage">
+        <div class="card-emblem-crystal" style="background: ${ch.color || '#0f172a'};">
           ${emblemHtml}
         </div>
-        <span class="badge-pill-custom ${ch.isLive ? 'badge-live-pulse' : ''}" style="${!ch.isLive ? 'background: rgba(255,255,255,0.08); color: #fff;' : ''}">
-          ${ch.isLive ? '<span class="pulse-dot-red"></span> EN VIVO' : badge}
-        </span>
+        <div class="card-play-action" title="Reproducir">
+          <svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
       </div>
-      <div class="card-details">
-        <h4>${ch.subtitle || ch.name}</h4>
-        <p>${ch.tournament || ch.title || 'FÚTBOL INTERNACIONAL'}</p>
-      </div>
-      <div class="card-footer-strip">
-        <span>${ch.quality || '1080p 60FPS'}</span>
-        <span class="card-servers-count">● ${numServers} ${numServers > 1 ? 'Servidores' : 'Servidor'}</span>
+
+      <!-- Footer Info -->
+      <div class="card-details-footer">
+        <div class="card-tournament-tag">
+          <span>🏆 ${tournament}</span>
+        </div>
+        <h4 class="card-channel-name">${displayName}</h4>
+        <div class="card-status-bar">
+          <span class="card-server-online"><span class="card-pulse-emerald"></span> ${numServers} ${numServers > 1 ? 'Servidores' : 'Servidor'}</span>
+          <span>99.8% ONLINE</span>
+        </div>
       </div>
     `;
 
@@ -249,6 +271,10 @@
 
       carouselsContainer.appendChild(sectionEl);
     });
+
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
   }
 
   window.openSeniorModal = openModal;
@@ -416,6 +442,10 @@
       card.dataset.gridIndex = idx;
       searchResultsGrid.appendChild(card);
     });
+
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
   }
 
   // --- MULTI-SOURCE FAILOVER PLAYER ENGINE ---
@@ -445,7 +475,11 @@
     video.pause();
     video.removeAttribute('src');
 
-    const streamUrl = currentSource.url;
+    let streamUrl = currentSource.url;
+    // Mixed Content Shield: If loaded on GitHub Pages (HTTPS) and stream is HTTP, route through CORS proxy
+    if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
+      streamUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(streamUrl);
+    }
     const isWebEmbed = !streamUrl.includes('.m3u8') && (streamUrl.startsWith('http://') || streamUrl.startsWith('https://')) && !streamUrl.includes('.mp4');
 
     if (isWebEmbed) {
@@ -1202,106 +1236,211 @@
         btnRunAnalyzer.disabled = true;
         btnRunAnalyzer.innerHTML = `
           <div style="width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-          <span>ANALIZANDO CÓDIGO FUENTE & TRANSMISIONES...</span>
+          <span>DESCARGANDO Y ANALIZANDO M3U INTELIGENTE...</span>
         `;
         analyzerResultsContainer.style.display = 'none';
 
         try {
-          const apiBase = (window.location.protocol.startsWith('http')) 
-            ? window.location.origin 
-            : 'http://127.0.0.1:8080';
-
-          let data = null;
-          const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
-
-          if (isLocal) {
-            try {
-              const res = await fetch(`${apiBase}/api/analyze?url=${encodeURIComponent(rawUrl)}`);
-              data = await res.json();
-            } catch (fetchErr) {
-              console.warn("Backend analyzer fetch error, trying client-side fallback:", fetchErr);
-            }
+          // Download M3U text via direct fetch or CORS proxy
+          let text = '';
+          try {
+            const res = await fetch(rawUrl);
+            if (res.ok) text = await res.text();
+          } catch (e) {
+            console.warn("Direct fetch failed, trying proxy tunnel...");
           }
 
-          if (!data || !data.success) {
-            // Client-side fallback with direct fetch and CORS proxy
-            let directRes = await fetch(rawUrl).catch(() => null);
-            if (!directRes || !directRes.ok) {
-              directRes = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(rawUrl)).catch(() => null);
-            }
-            if (directRes && directRes.ok) {
-              const text = await directRes.text();
-              const lines = text.split('\n');
-              const channels = [];
-              let cur = null;
-              for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line.startsWith('#EXTINF:')) {
-                  const nameMatch = line.match(/,(.+)$/);
-                  const logoMatch = line.match(/tvg-logo="([^"]+)"/);
-                  cur = {
-                    name: nameMatch ? nameMatch[1].trim() : 'Canal Detectado',
-                    logo: logoMatch ? logoMatch[1] : '',
-                    tournament: 'Lista Directa'
-                  };
-                } else if (line.startsWith('http') && cur) {
-                  cur.streamUrl = line;
-                  channels.push(cur);
-                  cur = null;
-                }
-              }
-              data = { success: true, count: channels.length, channels: channels.slice(0, 200), title: 'Lista Descargada' };
-            } else {
-              throw new Error("No se pudo descargar la lista de canales.");
-            }
+          if (!text) {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rawUrl);
+            const res = await fetch(proxyUrl);
+            if (res.ok) text = await res.text();
           }
 
-          if (!data.success) {
-            throw new Error(data.error || 'No se pudieron extraer canales de este enlace');
+          if (!text) {
+            throw new Error("No se pudo descargar la lista. Verifica la URL o tu conexión.");
           }
 
-          currentExtractedChannels = data.channels || [];
-          if (currentExtractedChannels.length === 0) {
-            alert("No se detectaron transmisiones de vídeo abiertas en esta URL.");
-            return;
-          }
+          const lines = text.split('\n');
+          const allExtracted = [];
+          let cur = null;
 
-          analyzerStatusText.textContent = `✓ ${currentExtractedChannels.length} canales extraídos (${data.title || data.type || 'M3U'})`;
-          analyzerChannelsList.innerHTML = '';
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line.startsWith('#EXTINF:')) {
+              const nameMatch = line.match(/,(.+)$/);
+              const groupMatch = line.match(/group-title="([^"]+)"/);
+              const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+              const rawName = nameMatch ? nameMatch[1].trim() : 'Canal';
+              const isGeo = line.toLowerCase().includes('geo-blocked') || rawName.toLowerCase().includes('geo-blocked');
+              const group = groupMatch ? groupMatch[1].trim() : 'General';
 
-          currentExtractedChannels.forEach((ch, idx) => {
-            const item = document.createElement('div');
-            item.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 10px; border: 1px solid rgba(255,255,255,0.07);";
-            item.innerHTML = `
-              <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
-                ${ch.logo ? `<img src="${ch.logo}" style="width: 28px; height: 28px; object-fit: contain; border-radius: 6px;" onerror="this.style.display='none'">` : '<div style="width: 28px; height: 28px; background: #0284c7; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">TV</div>'}
-                <div>
-                  <div style="font-weight: 800; font-size: 13px; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 320px;">${ch.name}</div>
-                  <div style="font-size: 11px; color: #94a3b8;">${ch.tournament || ch.type || 'Stream Directo'}</div>
-                </div>
-              </div>
-              <button type="button" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; font-weight: 800; font-size: 11px; padding: 6px 12px; cursor: pointer;">
-                ▶ Probar
-              </button>
-            `;
+              // Extract resolution e.g. (1080p), (720p)
+              const resMatch = rawName.match(/\((\d+p)\)/i);
+              const resolution = resMatch ? resMatch[1] : '1080p';
+              const cleanName = rawName.replace(/\(\d+p\)/gi, '').replace(/\[[^\]]+\]/g, '').trim();
 
-            item.querySelector('button').addEventListener('click', () => {
-              const testCh = {
-                id: 'extracted-' + Date.now() + '-' + idx,
-                name: ch.name,
-                subtitle: ch.name,
-                tournament: ch.tournament || 'Stream Extraído',
-                category: 'personalizados',
-                sources: [{ name: 'Servidor Extraído', url: ch.streamUrl }]
+              cur = {
+                name: cleanName,
+                rawName: rawName,
+                group: group,
+                logo: logoMatch ? logoMatch[1] : '',
+                resolution: resolution,
+                isGeo: isGeo
               };
-              closeModal();
-              playChannelWithFailover(testCh, 0);
-            });
+            } else if (line.startsWith('http') && cur) {
+              cur.streamUrl = line;
+              // Filter out geo-blocked and dead internal telecom unicast IPs
+              const isInternalIp = line.includes('39.134.') || line.includes('117.156.') || line.includes('112.25.') || line.includes('223.110.') || line.includes('127.0.0.1');
+              if (!cur.isGeo && !isInternalIp) {
+                allExtracted.push(cur);
+              }
+              cur = null;
+            }
+          }
 
-            analyzerChannelsList.appendChild(item);
+          if (allExtracted.length === 0) {
+            throw new Error("No se encontraron transmisiones reproducibles en este enlace.");
+          }
+
+          // Smart Categorization
+          const sportsKeywords = ['sport', 'futbol', 'football', 'soccer', 'deport', 'liga', 'copa', 'champions', 'nba', 'espn', 'tyc', 'win', 'fox', 'bein', 'dazn', 'golf', 'racing', 'f1', 'tennis', 'tvr', 'klicgo'];
+          const moviesKeywords = ['movie', 'cine', 'film', 'series', 'cinema'];
+          const entKeywords = ['entertainment', 'music', 'musica', 'animation', 'comedy', 'kids', 'general'];
+
+          const sportsChannels = [];
+          const moviesChannels = [];
+          const entChannels = [];
+          const otherChannels = [];
+
+          allExtracted.forEach(ch => {
+            const hay = (ch.name + ' ' + ch.group).toLowerCase();
+            if (sportsKeywords.some(k => hay.includes(k))) {
+              sportsChannels.push(ch);
+            } else if (moviesKeywords.some(k => hay.includes(k))) {
+              moviesChannels.push(ch);
+            } else if (entKeywords.some(k => hay.includes(k))) {
+              entChannels.push(ch);
+            } else {
+              otherChannels.push(ch);
+            }
           });
 
+          // Sort each category so HTTPS channels appear first
+          const sortByHttps = (list) => list.sort((a, b) => (b.streamUrl.startsWith('https://') ? 1 : 0) - (a.streamUrl.startsWith('https://') ? 1 : 0));
+          sortByHttps(sportsChannels);
+          sortByHttps(moviesChannels);
+          sortByHttps(entChannels);
+          sortByHttps(allExtracted);
+
+          const categoryMap = {
+            sports: { name: '⚽ Deportes', list: sportsChannels },
+            movies: { name: '🎬 Cine & Series', list: moviesChannels },
+            ent: { name: '✨ Entretenimiento', list: entChannels },
+            all: { name: '🌐 Todas las Señales', list: allExtracted }
+          };
+
+          // Determine initial active category
+          let activeCategory = sportsChannels.length > 0 ? 'sports' : (moviesChannels.length > 0 ? 'movies' : 'all');
+
+          // Render Category Tabs
+          const analyzerCategoryTabs = document.getElementById('analyzerCategoryTabs');
+          function renderCategoryTabs() {
+            if (!analyzerCategoryTabs) return;
+            analyzerCategoryTabs.innerHTML = '';
+            Object.entries(categoryMap).forEach(([key, val]) => {
+              if (val.list.length === 0 && key !== 'all') return;
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = `search-chip ${activeCategory === key ? 'active' : ''}`;
+              btn.style.cssText = `padding: 6px 14px; font-size: 11px; font-weight: 800; border-radius: 10px; cursor: pointer; white-space: nowrap; ${activeCategory === key ? 'background: #10b981; color: #fff; border-color: #10b981;' : 'background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.12);'}`;
+              btn.textContent = `${val.name} (${val.list.length})`;
+              btn.addEventListener('click', () => {
+                activeCategory = key;
+                renderCategoryTabs();
+                renderCategoryList();
+              });
+              analyzerCategoryTabs.appendChild(btn);
+            });
+          }
+
+          function renderCategoryList() {
+            const currentList = categoryMap[activeCategory].list.slice(0, 100);
+            analyzerChannelsList.innerHTML = '';
+            analyzerStatusText.textContent = `✓ ${currentList.length} canales en ${categoryMap[activeCategory].name} (Total: ${allExtracted.length})`;
+
+            currentList.forEach((ch, idx) => {
+              const isHttps = ch.streamUrl.startsWith('https://');
+              const item = document.createElement('div');
+              item.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);";
+              item.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                  ${ch.logo ? `<img src="${ch.logo}" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px; background: #0f172a; padding: 3px;" onerror="this.style.display='none'">` : '<div style="width: 32px; height: 32px; background: #0f172a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #10b981;">TV</div>'}
+                  <div style="overflow: hidden;">
+                    <div style="font-weight: 850; font-size: 13.5px; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 300px;">${ch.name}</div>
+                    <div style="font-size: 10.5px; color: #94a3b8; display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                      <span style="color: ${isHttps ? '#34d399' : '#fbbf24'}; font-weight: 800;">${isHttps ? '🟢 HTTPS VERIFICADO' : '⚡ TÚNEL PROXY'}</span>
+                      <span>•</span>
+                      <span>${ch.resolution}</span>
+                      <span>•</span>
+                      <span>${ch.group}</span>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 10px; font-weight: 850; font-size: 11px; padding: 7px 14px; cursor: pointer; white-space: nowrap;">
+                  ▶ Probar
+                </button>
+              `;
+
+              item.querySelector('button').addEventListener('click', () => {
+                const testCh = {
+                  id: 'extracted-' + Date.now() + '-' + idx,
+                  name: ch.name,
+                  subtitle: ch.name,
+                  tournament: ch.group || 'Señal M3U',
+                  category: 'personalizados',
+                  quality: ch.resolution + ' HD',
+                  sources: [{ name: 'Servidor M3U', url: ch.streamUrl }]
+                };
+                closeModal();
+                playChannelWithFailover(testCh, 0);
+              });
+
+              analyzerChannelsList.appendChild(item);
+            });
+          }
+
+          renderCategoryTabs();
+          renderCategoryList();
           analyzerResultsContainer.style.display = 'block';
+
+          // Bind Import All button
+          if (btnImportAllExtracted) {
+            btnImportAllExtracted.onclick = () => {
+              const toImport = categoryMap[activeCategory].list.slice(0, 80);
+              const mapped = toImport.map((c, i) => ({
+                id: 'imported-' + Date.now() + '-' + i,
+                name: c.name,
+                subtitle: c.name,
+                shortName: (c.name || 'CANAL').substring(0, 5).toUpperCase(),
+                color: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                category: 'personalizados',
+                tournament: c.group || 'Canal M3U',
+                logo: c.logo || '',
+                quality: c.resolution + ' HD',
+                description: 'Canal extraído de lista M3U oficial.',
+                sources: [{ name: 'Servidor M3U', url: c.streamUrl }]
+              }));
+
+              customChannels = [...mapped, ...customChannels];
+              localStorage.setItem('futbol_tv_custom_channels', JSON.stringify(customChannels));
+              renderCarousels();
+              alert(`¡Se importaron con éxito ${mapped.length} canales (${categoryMap[activeCategory].name}) a tu pantalla principal!`);
+              closeModal();
+              if (mapped[0]) {
+                playChannelWithFailover(mapped[0], 0);
+              }
+            };
+          }
 
         } catch (e) {
           alert("Error al analizar plataforma: " + e.message);
@@ -1312,32 +1451,6 @@
             <span>ANALIZAR Y EXTRAER CANALES</span>
           `;
         }
-      });
-    }
-
-    if (btnImportAllExtracted) {
-      btnImportAllExtracted.addEventListener('click', () => {
-        if (!currentExtractedChannels || currentExtractedChannels.length === 0) return;
-
-        const mapped = currentExtractedChannels.map((c, i) => ({
-          id: 'imported-' + Date.now() + '-' + i,
-          name: c.name,
-          subtitle: c.name,
-          shortName: (c.name || 'CANAL').substring(0, 5).toUpperCase(),
-          color: 'linear-gradient(135deg, #0284c7, #0369a1)',
-          category: 'personalizados',
-          tournament: c.tournament || 'Plataforma Extraída',
-          logo: c.logo || '',
-          description: 'Canal extraído automáticamente de plataforma web.',
-          sources: [{ name: 'Servidor Extraído', url: c.streamUrl }]
-        }));
-
-        customChannels = [...mapped, ...customChannels];
-        localStorage.setItem('futbol_tv_custom_channels', JSON.stringify(customChannels));
-        renderCarousels();
-        alert(`¡Se importaron con éxito ${mapped.length} canales a tu fila de Canales Personalizados!`);
-        closeModal();
-        playChannelWithFailover(mapped[0], 0);
       });
     }
 

@@ -3,13 +3,13 @@
  * Enables instant standalone installation on Hisense VIDAA OS & Android TV
  */
 
-const CACHE_NAME = 'tajho-tv-v6-responsive';
+const CACHE_NAME = 'tajho-tv-v7-luxury-cards';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles_senior.css?v=6.0',
-  './app_senior.js?v=6.0',
-  './channels_senior.js?v=6.0',
+  './styles_senior.css?v=7.0',
+  './app_senior.js?v=7.0',
+  './channels_senior.js?v=7.0',
   './logo.png',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;950&display=swap',
