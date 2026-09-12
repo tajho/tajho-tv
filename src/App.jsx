@@ -8,6 +8,12 @@ import { SearchView } from './components/SearchView';
 import { CinemaPlayer } from './components/CinemaPlayer';
 import { M3uModal } from './components/M3uModal';
 import { useAudioSynthesizer } from './hooks/useAudioSynthesizer';
+import { MATCHES_FIXTURES } from './data/fixturesRegistry';
+import { MatchCard } from './components/MatchCard';
+import { RemoteModal } from './components/RemoteModal';
+import { RemoteControllerSync } from './utils/RemoteSync';
+import { Flame } from 'lucide-react';
+
 
 // ─── Health Monitor Hook ─────────────────────────────────────────────────────
 // Verifica todos los canales pre-cargados al iniciar la app.
@@ -70,6 +76,9 @@ export default function App() {
   const [playingChannel, setPlayingChannel] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRemoteOpen, setIsRemoteOpen] = useState(false);
+  const [sessionPin] = useState(() => RemoteControllerSync.getSessionPin());
+
   const { playSound } = useAudioSynthesizer();
 
   // 🔴 Health monitor — verifica streams automáticamente
@@ -86,6 +95,26 @@ export default function App() {
     playSound('tick');
     setHeroChannel(ch);
   }, [playSound]);
+
+  
+  const handleSelectMatch = useCallback((match) => {
+    playSound('select');
+    const matchedCh = allChannels.find(c => c.id === match.targetChannelId) || channels[0];
+    setPlayingChannel(matchedCh);
+  }, [allChannels, channels, playSound]);
+
+  useEffect(() => {
+    const sync = new RemoteControllerSync(sessionPin, (cmd) => {
+      if (!cmd) return;
+      if (cmd.action === 'PLAY_CHANNEL') {
+        const found = allChannels.find(c => c.id === cmd.payload.channelId);
+        if (found) handleSelectChannel(found);
+      } else if (cmd.action === 'CLOSE_PLAYER') {
+        setPlayingChannel(null);
+      }
+    });
+    return () => sync.destroy();
+  }, [sessionPin, allChannels, handleSelectChannel]);
 
   const handleImportChannels = useCallback((imported) => {
     setCustomChannels(prev => {
@@ -128,6 +157,7 @@ export default function App() {
           setActiveTab(tab);
         }}
         onOpenModal={() => setIsModalOpen(true)}
+          onOpenRemote={() => setIsRemoteOpen(true)}
       />
 
       {/* Main Viewport */}
@@ -167,6 +197,23 @@ export default function App() {
             />
 
             {/* Carousels Track */}
+            
+            {/* AGENDA DEPORTIVA — Partidos de Hoy */}
+            <div className="matches-fixtures-container">
+              <div className="carousel-header mb-4">
+                <div className="carousel-title">
+                  <Flame size={22} className="text-amber-400" />
+                  <span>AGENDA DEPORTIVA — Partidos de Hoy</span>
+                </div>
+                <span className="carousel-count">{MATCHES_FIXTURES.length} PARTIDOS DESTACADOS</span>
+              </div>
+              <div className="matches-grid-track">
+                {MATCHES_FIXTURES.map((match) => (
+                  <MatchCard key={match.id} match={match} onSelectMatch={handleSelectMatch} />
+                ))}
+              </div>
+            </div>
+
             <div className="carousels-container" id="carouselsContainer">
               {SECTIONS.map((sec) => {
                 let items = [];
@@ -202,6 +249,7 @@ export default function App() {
       ) : null}
 
       {/* M3U & Platform Analyzer Modal */}
+      <RemoteModal isOpen={isRemoteOpen} onClose={() => setIsRemoteOpen(false)} pin={sessionPin} />
       <M3uModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

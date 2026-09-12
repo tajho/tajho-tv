@@ -43,6 +43,17 @@ export function CinemaPlayer({ channel, onClose }) {
 
     setBuffering(true);
 
+    // WATCHDOG SILENCIOSO ANTI-CAÍDAS: Si la señal se congela por más de 8s, conmuta a servidor respaldo
+    const watchdogTimer = setTimeout(() => {
+      if (buffering && !isPaused && sources.length > 1) {
+        console.warn('Watchdog failover triggered');
+        const nextIdx = (currentSourceIndex + 1) % sources.length;
+        setCurrentSourceIndex(nextIdx);
+        triggerToast("⚡ Conmutando a " + (sources[nextIdx]?.name || "Servidor Respaldo") + "...");
+      }
+    }, 8500);
+
+
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
@@ -94,6 +105,7 @@ export function CinemaPlayer({ channel, onClose }) {
     }
 
     return () => {
+      clearTimeout(watchdogTimer);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;

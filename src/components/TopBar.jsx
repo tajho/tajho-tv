@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, X, Plus, ShieldCheck } from 'lucide-react';
+import { Search, X, Plus, Smartphone } from 'lucide-react';
 
-export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearch, onOpenModal }) {
+export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearch, onOpenModal, onOpenRemote }) {
   return (
     <header className="tv-topbar">
       {/* Mobile Brand */}
@@ -39,6 +39,19 @@ export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearc
 
       {/* Topbar Actions */}
       <div className="topbar-actions">
+        {/* Botón Control con Celular */}
+        <motion.button
+          type="button"
+          className="btn-topbar-action !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-300"
+          onClick={onOpenRemote}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          title="Vincular con tu celular"
+        >
+          <Smartphone size={16} />
+          <span>Vincular Móvil</span>
+        </motion.button>
+
         <motion.button
           type="button"
           className="btn-topbar-action"
@@ -47,7 +60,7 @@ export function TopBar({ searchQuery, onSearchChange, onSearchClear, onOpenSearc
           whileTap={{ scale: 0.96 }}
         >
           <Plus size={16} />
-          <span>Analizar M3U / Web</span>
+          <span>Analizar M3U</span>
         </motion.button>
 
         <div className="topbar-live-status">
