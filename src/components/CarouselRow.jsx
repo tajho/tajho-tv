@@ -10,7 +10,7 @@ const iconMap = {
   'folder-plus': FolderPlus
 };
 
-export function CarouselRow({ section, channels, focusedCardId, onSelectChannel, onFocusChannel, onOpenM3uModal }) {
+export function CarouselRow({ section, channels, focusedCardId, onSelectChannel, onFocusChannel, onOpenM3uModal, streamStatus = {} }) {
   const IconComponent = iconMap[section.icon] || Tv;
 
   if (channels.length === 0 && section.id === 'personalizados') {
@@ -27,11 +27,7 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
             <h4 className="text-base font-extrabold text-white mb-1">No tienes canales personalizados aún</h4>
             <p className="text-xs sm:text-sm text-slate-400">Agrega cualquier enlace .m3u8, reproductor web o analiza listas M3U.</p>
           </div>
-          <button
-            type="button"
-            className="btn-luxury-primary px-5 py-2.5 text-xs sm:text-sm"
-            onClick={onOpenM3uModal}
-          >
+          <button type="button" className="btn-luxury-primary px-5 py-2.5 text-xs sm:text-sm" onClick={onOpenM3uModal}>
             <span>➕ Cargar Lista M3U</span>
           </button>
         </div>
@@ -41,6 +37,8 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
 
   if (channels.length === 0) return null;
 
+  const onlineCount = channels.filter(c => streamStatus[c.id] === 'online').length;
+
   return (
     <div className="carousel-section">
       <div className="carousel-header">
@@ -48,7 +46,14 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
           <IconComponent size={22} className="text-emerald-400" />
           <span>{section.title}</span>
         </div>
-        <span className="carousel-count">{channels.length} SEÑALES</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {onlineCount > 0 && (
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#10b981', letterSpacing: 1 }}>
+              🟢 {onlineCount} ONLINE
+            </span>
+          )}
+          <span className="carousel-count">{channels.length} SEÑALES</span>
+        </div>
       </div>
 
       <div className="carousel-track">
@@ -59,6 +64,7 @@ export function CarouselRow({ section, channels, focusedCardId, onSelectChannel,
             isFocused={focusedCardId === ch.id}
             onSelect={onSelectChannel}
             onFocus={() => onFocusChannel(ch)}
+            streamStatus={streamStatus[ch.id] || 'checking'}
           />
         ))}
       </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { CHANNELS_REGISTRY, SECTIONS } from './data/channelsRegistry';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { CHANNELS_REGISTRY, SECTIONS, checkStreamHealth } from './data/channelsRegistry';
 import { SidebarRail } from './components/SidebarRail';
 import { TopBar } from './components/TopBar';
 import { HeroBillboard } from './components/HeroBillboard';
@@ -9,6 +9,51 @@ import { CinemaPlayer } from './components/CinemaPlayer';
 import { M3uModal } from './components/M3uModal';
 import { useAudioSynthesizer } from './hooks/useAudioSynthesizer';
 
+// ─── Health Monitor Hook ─────────────────────────────────────────────────────
+// Verifica todos los canales pre-cargados al iniciar la app.
+// Inyecta streamStatus = { [id]: 'online' | 'checking' | 'offline' } al contexto.
+function useStreamHealthMonitor(channels) {
+  const [status, setStatus] = useState(() => {
+    const init = {};
+    channels.forEach(c => { init[c.id] = 'checking'; });
+    return init;
+  });
+
+  const monitorRef = useRef(null);
+
+  const runCheck = useCallback(async (channelList) => {
+    for (const ch of channelList) {
+      // Test only the first (primary) source — quick HEAD request
+      const primaryUrl = ch.sources?.[0]?.url;
+      if (!primaryUrl) {
+        setStatus(prev => ({ ...prev, [ch.id]: 'offline' }));
+        continue;
+      }
+      try {
+        const alive = await checkStreamHealth(primaryUrl, 6000);
+        setStatus(prev => ({ ...prev, [ch.id]: alive ? 'online' : 'offline' }));
+      } catch {
+        setStatus(prev => ({ ...prev, [ch.id]: 'offline' }));
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial check on mount
+    runCheck(channels);
+
+    // Re-check every 5 minutes to keep statuses fresh
+    monitorRef.current = setInterval(() => {
+      runCheck(channels);
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(monitorRef.current);
+  }, [channels, runCheck]);
+
+  return status;
+}
+
+// ─── App ─────────────────────────────────────────────────────────────────────
 export default function App() {
   const [channels] = useState(CHANNELS_REGISTRY);
   const [customChannels, setCustomChannels] = useState(() => {
@@ -26,6 +71,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { playSound } = useAudioSynthesizer();
+
+  // 🔴 Health monitor — verifica streams automáticamente
+  const streamStatus = useStreamHealthMonitor(channels);
 
   const allChannels = [...channels, ...customChannels];
 
@@ -94,6 +142,8 @@ export default function App() {
           onSearchClear={() => setSearchQuery('')}
           onOpenSearch={() => setActiveTab('search')}
           onOpenModal={() => setIsModalOpen(true)}
+          streamStatus={streamStatus}
+          totalChannels={channels.length}
         />
 
         {/* View Routing */}
@@ -104,6 +154,7 @@ export default function App() {
             onClose={() => setActiveTab('home')}
             onSelectChannel={handleSelectChannel}
             onOpenModal={() => setIsModalOpen(true)}
+            streamStatus={streamStatus}
           />
         ) : (
           <>
@@ -112,6 +163,7 @@ export default function App() {
               channel={heroChannel}
               onPlay={handleSelectChannel}
               onOpenModal={() => setIsModalOpen(true)}
+              streamStatus={streamStatus}
             />
 
             {/* Carousels Track */}
@@ -132,6 +184,7 @@ export default function App() {
                     onSelectChannel={handleSelectChannel}
                     onFocusChannel={handleFocusChannel}
                     onOpenM3uModal={() => setIsModalOpen(true)}
+                    streamStatus={streamStatus}
                   />
                 );
               })}
